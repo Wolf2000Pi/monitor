@@ -1,0 +1,9 @@
+{
+  "name": "service-monitor",
+  "version": "1.0.0",
+  "description": "Einfacher Service-Monitor",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

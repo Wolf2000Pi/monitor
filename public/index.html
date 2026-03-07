@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Monitor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 30px; color: #00d9ff; }
+    .status-bar {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #16213e;
+      border-radius: 8px;
+    }
+    .status-bar span { margin: 0 15px; }
+    .online-count { color: #00ff88; }
+    .offline-count { color: #ff4757; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      border-left: 4px solid #666;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card.online { border-left-color: #00ff88; }
+    .card.offline { border-left-color: #ff4757; }
+    .card-name { font-size: 1.2em; font-weight: bold; margin-bottom: 8px; }
+    .card-url { color: #888; font-size: 0.85em; margin-bottom: 12px; word-break: break-all; }
+    .card-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .card.online .card-status { background: #00ff8822; color: #00ff88; }
+    .card.offline .card-status { background: #ff475722; color: #ff4757; }
+    .card-response { float: right; color: #888; font-size: 0.9em; }
+    .last-updated { text-align: center; margin-top: 20px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>📊 Service Monitor</h1>
+  <div class="status-bar">
+    <span class="online-count">Online: <strong id="online">0</strong></span>
+    <span class="offline-count">Offline: <strong id="offline">0</strong></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="last-updated">Letzte Aktualisierung: <span id="lastUpdate">-</span></div>
+
+  <script>
+    let config = { refreshInterval: 30000 };
+    
+    async function loadConfig() {
+      const res = await fetch('/api/config');
+      config = await res.json();
+    }
+    
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        render(data);
+      } catch (e) {
+        console.error('Error fetching status:', e);
+      }
+    }
+    
+    function render(services) {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      
+      let online = 0, offline = 0;
+      
+      services.forEach(s => {
+        if (s.status === 'online') online++;
+        else offline++;
+        
+        const card = document.createElement('div');
+        card.className = `card ${s.status}`;
+        card.innerHTML = `
+          <div class="card-name">${s.name}</div>
+          <div class="card-url">${s.url}</div>
+          <span class="card-status">${s.status.toUpperCase()}</span>
+          <span class="card-response">${s.responseTime}ms</span>
+        `;
+        grid.appendChild(card);
+      });
+      
+      document.getElementById('online').textContent = online;
+      document.getElementById('offline').textContent = offline;
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+    }
+    
+    loadConfig().then(() => {
+      fetchStatus();
+      setInterval(fetchStatus, config.refreshInterval);
+    });
+  </script>
+</body>
+</html>
