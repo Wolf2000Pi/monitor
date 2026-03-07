@@ -82,6 +82,26 @@ const server = http.createServer(async (req, res) => {
         res.end(data);
       }
     });
+  } else if (req.url.startsWith('/assets/')) {
+    const filePath = path.join(__dirname, req.url);
+    const ext = path.extname(filePath);
+    const contentTypes = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.ico': 'image/x-icon',
+      '.svg': 'image/svg+xml'
+    };
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end('Not found');
+      } else {
+        res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'application/octet-stream' });
+        res.end(data);
+      }
+    });
   } else {
     res.writeHead(404);
     res.end('Not found');

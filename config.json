@@ -7,17 +7,17 @@
     {
       "name": "Google",
       "url": "https://www.google.com",
-      "logo": "https://www.google.com/favicon.ico"
+      "logo": "/assets/img/bigw9.png"
     },
     {
       "name": "GitHub",
       "url": "https://github.com",
-      "logo": "https://github.com/favicon.ico"
+      "logo": "/assets/img/bigw9.png"
     },
     {
       "name": "Cloudflare",
       "url": "https://cloudflare.com",
-      "logo": "https://cloudflare.com/favicon.ico"
+      "logo": "/assets/img/bigw9.png"
     }
   ]
 }

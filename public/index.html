@@ -41,6 +41,7 @@
       transition: transform 0.2s;
     }
     .card:hover { transform: translateY(-2px); }
+    .card a { text-decoration: none; color: inherit; display: block; }
     .card.online { border-left-color: #00ff88; }
     .card.offline { border-left-color: #ff4757; }
     .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
@@ -112,8 +113,10 @@
         if (s.status === 'online') online++;
         else offline++;
         
-        const card = document.createElement('div');
+        const card = document.createElement('a');
         card.className = `card ${s.status}`;
+        card.href = s.url;
+        card.target = '_blank';
         const logoImg = s.logo ? `<img class="card-logo" src="${s.logo}" onerror="this.style.display='none'">` : '';
         card.innerHTML = `
           <div class="card-header">
