@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const repoUrl = 'https://github.com/YOUR_USERNAME/monitor.git';
+const repoUrl = 'https://github.com/Wolf2000Pi/monitor.git';
 const repoPath = __dirname;
 
 function run(cmd) {
