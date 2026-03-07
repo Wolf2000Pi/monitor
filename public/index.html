@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Service Monitor Bigwolf2000</title>
+  <title>Service Monitor</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -13,7 +13,9 @@
       min-height: 100vh;
       padding: 20px;
     }
-    h1 { text-align: center; margin-bottom: 30px; color: #00d9ff; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header img { height: 60px; margin-bottom: 10px; }
+    h1 { color: #00d9ff; }
     .status-bar {
       text-align: center;
       margin-bottom: 20px;
@@ -41,8 +43,11 @@
     .card:hover { transform: translateY(-2px); }
     .card.online { border-left-color: #00ff88; }
     .card.offline { border-left-color: #ff4757; }
-    .card-name { font-size: 1.2em; font-weight: bold; margin-bottom: 8px; }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .card-logo { width: 32px; height: 32px; object-fit: contain; }
+    .card-name { font-size: 1.2em; font-weight: bold; }
     .card-url { color: #888; font-size: 0.85em; margin-bottom: 12px; word-break: break-all; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; }
     .card-status {
       display: inline-block;
       padding: 4px 12px;
@@ -52,12 +57,15 @@
     }
     .card.online .card-status { background: #00ff8822; color: #00ff88; }
     .card.offline .card-status { background: #ff475722; color: #ff4757; }
-    .card-response { float: right; color: #888; font-size: 0.9em; }
+    .card-response { color: #888; font-size: 0.9em; }
     .last-updated { text-align: center; margin-top: 20px; color: #666; }
   </style>
 </head>
 <body>
-  <h1>📊 Service Monitor</h1>
+  <div class="header">
+    <img id="logo" src="" alt="Logo" style="display:none">
+    <h1 id="title">Service Monitor</h1>
+  </div>
   <div class="status-bar">
     <span class="online-count">Online: <strong id="online">0</strong></span>
     <span class="offline-count">Offline: <strong id="offline">0</strong></span>
@@ -71,6 +79,17 @@
     async function loadConfig() {
       const res = await fetch('/api/config');
       config = await res.json();
+      
+      if (config.title) {
+        document.getElementById('title').textContent = config.title;
+        document.title = config.title;
+      }
+      
+      if (config.logo) {
+        const logo = document.getElementById('logo');
+        logo.src = config.logo;
+        logo.style.display = 'inline';
+      }
     }
     
     async function fetchStatus() {
@@ -95,11 +114,17 @@
         
         const card = document.createElement('div');
         card.className = `card ${s.status}`;
+        const logoImg = s.logo ? `<img class="card-logo" src="${s.logo}" onerror="this.style.display='none'">` : '';
         card.innerHTML = `
-          <div class="card-name">${s.name}</div>
+          <div class="card-header">
+            ${logoImg}
+            <div class="card-name">${s.name}</div>
+          </div>
           <div class="card-url">${s.url}</div>
-          <span class="card-status">${s.status.toUpperCase()}</span>
-          <span class="card-response">${s.responseTime}ms</span>
+          <div class="card-footer">
+            <span class="card-status">${s.status.toUpperCase()}</span>
+            <span class="card-response">${s.responseTime}ms</span>
+          </div>
         `;
         grid.appendChild(card);
       });

@@ -17,6 +17,7 @@ function checkService(service) {
       resolve({
         name: service.name,
         url: service.url,
+        logo: service.logo,
         status: res.statusCode >= 200 && res.statusCode < 400 ? 'online' : 'offline',
         statusCode: res.statusCode,
         responseTime: responseTime,
@@ -28,6 +29,7 @@ function checkService(service) {
       resolve({
         name: service.name,
         url: service.url,
+        logo: service.logo,
         status: 'offline',
         statusCode: 0,
         responseTime: Date.now() - start,
@@ -40,6 +42,7 @@ function checkService(service) {
       resolve({
         name: service.name,
         url: service.url,
+        logo: service.logo,
         status: 'offline',
         statusCode: 0,
         responseTime: config.timeout,
@@ -64,8 +67,10 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify(status));
   } else if (req.url === '/api/config') {
     res.end(JSON.stringify({
+      title: config.title || 'Service Monitor',
+      logo: config.logo,
       refreshInterval: config.refreshInterval,
-      services: config.services.map(s => ({ name: s.name, url: s.url }))
+      services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
     }));
   } else if (req.url === '/' || req.url === '/index.html') {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {

@@ -1,21 +1,23 @@
 {
+  "title": "Mein Monitor",
+  "logo": "/assets/logo.png",
   "refreshInterval": 30000,
   "timeout": 5000,
   "services": [
     {
       "name": "Google",
       "url": "https://www.google.com",
-      "type": "http"
+      "logo": "https://www.google.com/favicon.ico"
     },
     {
       "name": "GitHub",
       "url": "https://github.com",
-      "type": "http"
+      "logo": "https://github.com/favicon.ico"
     },
     {
       "name": "Cloudflare",
       "url": "https://cloudflare.com",
-      "type": "http"
+      "logo": "https://cloudflare.com/favicon.ico"
     }
   ]
 }
