@@ -39,9 +39,12 @@
       padding: 20px;
       border-left: 4px solid #666;
       transition: transform 0.2s;
+      outline: none;
+      box-shadow: none;
     }
     .card:hover { transform: translateY(-2px); }
-    .card a { text-decoration: none; color: inherit; display: block; }
+    .card a { text-decoration: none; color: inherit; display: block; outline: none; }
+    .card:focus { outline: none; box-shadow: none; }
     .card.online { border-left-color: #00ff88; }
     .card.offline { border-left-color: #ff4757; }
     .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
