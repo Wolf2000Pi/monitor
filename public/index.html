@@ -36,6 +36,7 @@
       margin: 0 auto;
     }
     a.card {
+    text-decoration: none !important; 
     outline: none !important;
     box-shadow: none !important;
     filter: none !important;
@@ -45,6 +46,7 @@
     box-shadow: none !important;
     filter: none !important;}
     .card {
+    text-decoration: none !important;
     background: #4a4a4a;              /* Keine Transparenz → kein Glow */
     border-radius: 12px;
     padding: 20px;
@@ -60,7 +62,7 @@
     .card:hover { transform: translateY(-2px);
     box-shadow: none !important;
     filter: none !important; }
-    .card a { text-decoration: none; color: inherit; display: block; outline: none; }
+    .card a { text-decoration: none !important; color: inherit; display: block; outline: none; }
     .card::before,
     .card::after {
     box-shadow: none !important;
