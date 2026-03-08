@@ -46,8 +46,7 @@
     .card.offline { border-left-color: #ff4757; }
     .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
     .card-logo { width: 32px; height: 32px; object-fit: contain; }
-    .card-name { font-size: 1.2em; font-weight: bold;  color: #ffffff;}
-    .card-url { color: #888; font-size: 0.85em; margin-bottom: 12px; word-break: break-all; }
+    .card-name { font-size: 1.2em; font-weight: bold; color: #ffffff; }
     .card-footer { display: flex; justify-content: space-between; align-items: center; }
     .card-status {
       display: inline-block;
@@ -123,7 +122,6 @@
             ${logoImg}
             <div class="card-name">${s.name}</div>
           </div>
-          <div class="card-url">${s.url}</div>
           <div class="card-footer">
             <span class="card-status">${s.status.toUpperCase()}</span>
             <span class="card-response">${s.responseTime}ms</span>
