@@ -42,13 +42,15 @@
       transition: transform 0.2s;
       outline: none;
       box-shadow: none;
-      text-decoration: none;
-      color: inherit;
     }
     .card:hover { transform: translateY(-2px); }
     .card a { text-decoration: none; color: inherit; display: block; outline: none; }
     .card:focus { outline: none; box-shadow: none; }
-    .card-name { font-size: 1.2em; font-weight: bold; color: #ffffff; text-shadow: none; }
+    .card.online { border-left-color: #00ff88; }
+    .card.offline { border-left-color: #ff4757; }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .card-logo { width: 64px; height: 64px; object-fit: contain; }
+    .card-name { font-size: 1.2em; font-weight: bold; color: #ffffff; }
     .card-footer { display: flex; justify-content: space-between; align-items: center; }
     .card-status {
       display: inline-block;
@@ -61,8 +63,6 @@
     .card.offline .card-status { background: #ff475722; color: #ff4757; }
     .card-response { color: #888; font-size: 0.9em; }
     .last-updated { text-align: center; margin-top: 20px; color: #666; }
-    ::selection { background: transparent; color: inherit; text-shadow: none; }
-    ::-moz-selection { background: transparent; color: inherit; }
   </style>
 </head>
 <body>
