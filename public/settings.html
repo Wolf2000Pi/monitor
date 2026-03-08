@@ -23,7 +23,7 @@
       margin-bottom: 15px;
     }
     label { display: block; margin-bottom: 5px; color: #aaa; }
-    input[type="text"], input[type="number"], input[type="url"] {
+    input[type="text"], input[type="number"], input[type="url"], select {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
@@ -33,6 +33,10 @@
       color: #fff;
       font-size: 14px;
     }
+    select { cursor: pointer; }
+    .logo-select-wrapper { display: flex; gap: 10px; }
+    .logo-select-wrapper select { flex: 1; }
+    .logo-select-wrapper input { flex: 1; }
     .service-row {
       display: flex;
       gap: 10px;
@@ -44,6 +48,7 @@
     }
     .service-row input { margin-bottom: 0; flex: 1; }
     .service-row input:first-child { max-width: 150px; }
+    .service-row select { margin-bottom: 0; flex: 1; }
     .btn {
       padding: 10px 20px;
       border: none;
@@ -83,8 +88,8 @@
       <label>Titel</label>
       <input type="text" id="title" placeholder="Mein Monitor">
       
-      <label>Logo URL</label>
-      <input type="text" id="logo" placeholder="/assets/logo.png">
+      <label>Logo</label>
+      <select id="logo"></select>
       
       <label>Refresh Interval (ms)</label>
       <input type="number" id="refreshInterval" value="30000">
@@ -104,13 +109,34 @@
 
   <script>
     let config = {};
+    let images = [];
+    
+    async function loadImages() {
+      try {
+        const res = await fetch('/api/images');
+        images = await res.json();
+      } catch (e) {
+        images = [];
+      }
+    }
+    
+    function createLogoSelect(selected = '') {
+      let options = '<option value="">-- Kein Logo --</option>';
+      images.forEach(img => {
+        const selectedAttr = img === selected ? ' selected' : '';
+        options += `<option value="${img}"${selectedAttr}>${img.split('/').pop()}</option>`;
+      });
+      return options;
+    }
     
     async function loadConfig() {
+      await loadImages();
+      
       const res = await fetch('/api/config');
       config = await res.json();
       
       document.getElementById('title').value = config.title || '';
-      document.getElementById('logo').value = config.logo || '';
+      document.getElementById('logo').innerHTML = createLogoSelect(config.logo);
       document.getElementById('refreshInterval').value = config.refreshInterval || 30000;
       document.getElementById('timeout').value = config.timeout || 5000;
       
@@ -128,7 +154,7 @@
       div.innerHTML = `
         <input type="text" placeholder="Name" value="${name}">
         <input type="url" placeholder="URL" value="${url}">
-        <input type="text" placeholder="Logo URL" value="${logo}">
+        <select class="logo-select">${createLogoSelect(logo)}</select>
         <button class="btn btn-danger btn-remove" onclick="this.parentElement.remove()">✕</button>
       `;
       document.getElementById('services').appendChild(div);
@@ -139,18 +165,20 @@
       const services = [];
       rows.forEach(row => {
         const inputs = row.querySelectorAll('input');
+        const logoSelect = row.querySelector('.logo-select');
         if (inputs[1].value) {
           services.push({
             name: inputs[0].value,
             url: inputs[1].value,
-            logo: inputs[2].value
+            logo: logoSelect ? logoSelect.value : ''
           });
         }
       });
       
+      const logoSelect = document.getElementById('logo');
       const newConfig = {
         title: document.getElementById('title').value,
-        logo: document.getElementById('logo').value,
+        logo: logoSelect.value,
         refreshInterval: parseInt(document.getElementById('refreshInterval').value),
         timeout: parseInt(document.getElementById('timeout').value),
         services: services

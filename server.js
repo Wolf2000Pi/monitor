@@ -109,6 +109,17 @@ const server = http.createServer(async (req, res) => {
         res.end(data);
       }
     });
+  } else if (req.url === '/api/images') {
+    const imagesDir = path.join(__dirname, 'assets', 'img');
+    let images = [];
+    try {
+      if (fs.existsSync(imagesDir)) {
+        images = fs.readdirSync(imagesDir).filter(f => 
+          ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg'].includes(path.extname(f).toLowerCase())
+        );
+      }
+    } catch (e) {}
+    res.end(JSON.stringify(images.map(f => '/assets/img/' + f)));
   } else if (req.url.startsWith('/assets/')) {
     const filePath = path.join(__dirname, req.url);
     const ext = path.extname(filePath);
