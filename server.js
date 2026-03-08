@@ -59,24 +59,51 @@ async function checkAllServices() {
 
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
   if (req.url === '/api/status') {
     const status = await checkAllServices();
     res.end(JSON.stringify(status));
   } else if (req.url === '/api/config') {
-    res.end(JSON.stringify({
-      title: config.title || 'Service Monitor',
-      logo: config.logo,
-      refreshInterval: config.refreshInterval,
-      services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
-    }));
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const newConfig = JSON.parse(body);
+          fs.writeFileSync('config.json', JSON.stringify(newConfig, null, 2));
+          Object.assign(config, newConfig);
+          res.end(JSON.stringify({ success: true }));
+        } catch (e) {
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: e.message }));
+        }
+      });
+    } else {
+      res.end(JSON.stringify({
+        title: config.title || 'Service Monitor',
+        logo: config.logo,
+        refreshInterval: config.refreshInterval,
+        timeout: config.timeout,
+        services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
+      }));
+    }
   } else if (req.url === '/' || req.url === '/index.html') {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
       if (err) {
         res.writeHead(500);
         res.end('Error loading index.html');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
+  } else if (req.url === '/settings' || req.url === '/settings.html') {
+    fs.readFile(path.join(__dirname, 'public', 'settings.html'), (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Error loading settings.html');
       } else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(data);
