@@ -43,21 +43,28 @@
     a.card:focus-visible {
     outline: none !important;
     box-shadow: none !important;
-    filter: none !important;
-  }
+    filter: none !important;}
     .card {
-      background: #555555;
-      border-radius: 12px;
-      padding: 20px;
-      border-left: 4px solid #666;
-      transition: transform 0.2s;
-      outline: none;
-      text-shadow: none !important;
-      box-shadow: none !important;
+    background: #4a4a4a;              /* Keine Transparenz → kein Glow */
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #666;
+    transition: transform 0.2s;
+    color: #fff;
+
+    /* Schatten komplett deaktivieren */
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important; 
     }
-    .card:hover { transform: translateY(-2px); }
-    .card:hover {box-shadow: none !important; }
+    .card:hover { transform: translateY(-2px);
+    box-shadow: none !important;
+    filter: none !important; }
     .card a { text-decoration: none; color: inherit; display: block; outline: none; }
+    .card::before,
+    .card::after {
+    box-shadow: none !important;
+    filter: none !important;}
     .card:focus { outline: none; box-shadow: none; }
     .card.online { border-left-color: #00ff88; }
     .card.offline { border-left-color: #ff4757; }
