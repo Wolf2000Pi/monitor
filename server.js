@@ -32,29 +32,33 @@ function checkService(service) {
     const start = Date.now();
     const isHttps = service.url.startsWith('https');
     const protocol = isHttps ? https : http;
+    const timeout = config.timeout || 15000;
     
     const options = { 
-      timeout: 10000,
+      timeout: timeout,
       rejectUnauthorized: false,
       family: 4,
-      headers: { 'User-Agent': 'Monitor/1.0' }
+      headers: { 'User-Agent': 'Mozilla/5.0' }
     };
     
     const req = protocol.get(service.url, options, (res) => {
       const responseTime = Date.now() - start;
-      resolve({
-        name: service.name,
-        url: service.url,
-        logo: service.logo,
-        status: res.statusCode >= 200 && res.statusCode < 600 ? 'online' : 'offline',
-        statusCode: res.statusCode,
-        responseTime: responseTime,
-        timestamp: new Date().toISOString()
+      res.on('data', () => {}); // Force read response
+      res.on('end', () => {
+        resolve({
+          name: service.name,
+          url: service.url,
+          logo: service.logo,
+          status: res.statusCode >= 200 && res.statusCode < 600 ? 'online' : 'offline',
+          statusCode: res.statusCode,
+          responseTime: responseTime,
+          timestamp: new Date().toISOString()
+        });
       });
     });
     
     req.on('error', (err) => {
-      console.error(`Error checking ${service.name}:`, err.code);
+      console.error(`Error ${service.name}:`, err.code);
       resolve({
         name: service.name,
         url: service.url,
@@ -76,7 +80,7 @@ function checkService(service) {
         status: 'offline',
         statusCode: 0,
         error: 'timeout',
-        responseTime: config.timeout,
+        responseTime: timeout,
         timestamp: new Date().toISOString()
       });
     });
