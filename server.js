@@ -106,9 +106,8 @@ const server = http.createServer(async (req, res) => {
   
   const needsAuth = config.username && config.password;
   
-  const url = req.url.split('?')[0]; // Remove query params first!
+  const url = req.url.split('?')[0];
    
-  // Auth for settings and config - only block POST to settings
   if (needsAuth && !checkAuth(req)) {
     if (url.startsWith('/settings') || 
         url === '/settings.html' ||
@@ -117,8 +116,6 @@ const server = http.createServer(async (req, res) => {
     }
   }
    
-  // Public routes
-  
   if (url === '/') {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
       if (err) {
