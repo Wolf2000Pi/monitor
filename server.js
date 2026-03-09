@@ -104,10 +104,7 @@ const server = http.createServer(async (req, res) => {
   
   if (needsAuth && !checkAuth(req)) {
     if (req.url.startsWith('/settings') || 
-        req.url.startsWith('/api/config') ||
-        req.url === '/' || 
-        req.url === '/index.html' ||
-        req.url === '/api/status') {
+        req.url.startsWith('/api/config')) {
       return requireAuth(req, res);
     }
   }
