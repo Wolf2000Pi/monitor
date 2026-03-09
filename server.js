@@ -30,9 +30,15 @@ function requireAuth(req, res) {
 function checkService(service) {
   return new Promise((resolve) => {
     const start = Date.now();
-    const protocol = service.url.startsWith('https') ? https : http;
+    const isHttps = service.url.startsWith('https');
+    const protocol = isHttps ? https : http;
     
-    const req = protocol.get(service.url, { timeout: config.timeout }, (res) => {
+    const options = { 
+      timeout: config.timeout,
+      rejectUnauthorized: false
+    };
+    
+    const req = protocol.get(service.url, options, (res) => {
       const responseTime = Date.now() - start;
       resolve({
         name: service.name,
