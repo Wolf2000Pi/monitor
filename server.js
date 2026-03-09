@@ -34,9 +34,10 @@ function checkService(service) {
     const protocol = isHttps ? https : http;
     
     const options = { 
-      timeout: config.timeout,
+      timeout: 10000,
       rejectUnauthorized: false,
-      family: 4
+      family: 4,
+      headers: { 'User-Agent': 'Monitor/1.0' }
     };
     
     const req = protocol.get(service.url, options, (res) => {
@@ -45,7 +46,7 @@ function checkService(service) {
         name: service.name,
         url: service.url,
         logo: service.logo,
-        status: res.statusCode >= 200 && res.statusCode < 400 ? 'online' : 'offline',
+        status: res.statusCode >= 200 && res.statusCode < 600 ? 'online' : 'offline',
         statusCode: res.statusCode,
         responseTime: responseTime,
         timestamp: new Date().toISOString()
@@ -53,6 +54,7 @@ function checkService(service) {
     });
     
     req.on('error', (err) => {
+      console.error(`Error checking ${service.name}:`, err.code);
       resolve({
         name: service.name,
         url: service.url,
