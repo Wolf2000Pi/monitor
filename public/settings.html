@@ -23,7 +23,7 @@
       margin-bottom: 15px;
     }
     label { display: block; margin-bottom: 5px; color: #aaa; }
-    input[type="text"], input[type="number"], input[type="url"], select {
+    input[type="text"], input[type="number"], input[type="url"], input[type="password"], select {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
@@ -91,6 +91,12 @@
       <label>Logo</label>
       <select id="logo"></select>
       
+      <label>Benutzername</label>
+      <input type="text" id="username" placeholder="admin">
+      
+      <label>Passwort</label>
+      <input type="password" id="password" placeholder="Passwort">
+      
       <label>Refresh Interval (ms)</label>
       <input type="number" id="refreshInterval" value="30000">
       
@@ -137,8 +143,13 @@
       
       document.getElementById('title').value = config.title || '';
       document.getElementById('logo').innerHTML = createLogoSelect(config.logo);
+      document.getElementById('username').value = config.username || '';
+      document.getElementById('password').value = '';
+      document.getElementById('password').placeholder = config.hasAuth ? 'Passwort ändern' : 'Passwort';
       document.getElementById('refreshInterval').value = config.refreshInterval || 30000;
       document.getElementById('timeout').value = config.timeout || 5000;
+      
+      window.hasAuth = config.hasAuth || false;
       
       const servicesDiv = document.getElementById('services');
       servicesDiv.innerHTML = '';
@@ -176,18 +187,28 @@
       });
       
       const logoSelect = document.getElementById('logo');
+      const newUsername = document.getElementById('username').value;
+      const newPassword = document.getElementById('password').value;
+      
       const newConfig = {
         title: document.getElementById('title').value,
         logo: logoSelect.value,
+        username: newUsername,
+        password: newPassword || (window.hasAuth ? (config.password || '') : ''),
         refreshInterval: parseInt(document.getElementById('refreshInterval').value),
         timeout: parseInt(document.getElementById('timeout').value),
         services: services
       };
       
+      const headers = { 'Content-Type': 'application/json' };
+      if (window.hasAuth && newUsername && newPassword) {
+        headers['Authorization'] = 'Basic ' + btoa(newUsername + ':' + newPassword);
+      }
+      
       try {
         const res = await fetch('/api/config', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify(newConfig)
         });
         const result = await res.json();

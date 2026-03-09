@@ -1,6 +1,8 @@
 {
   "title": "Mein Monitor",
   "logo": "/assets/logo.png",
+  "username": "",
+  "password": "",
   "refreshInterval": 30000,
   "timeout": 5000,
   "services": [

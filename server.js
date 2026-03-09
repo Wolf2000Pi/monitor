@@ -2,10 +2,30 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 const PORT = process.env.PORT || 3000;
+
+function checkAuth(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Basic ')) return false;
+  
+  const base64 = authHeader.slice(6);
+  const decoded = Buffer.from(base64, 'base64').toString();
+  const [username, password] = decoded.split(':');
+  
+  return username === config.username && password === config.password;
+}
+
+function requireAuth(req, res) {
+  res.writeHead(401, {
+    'WWW-Authenticate': 'Basic realm="Monitor"',
+    'Content-Type': 'text/html'
+  });
+  res.end('<html><body><h1>401 Unauthorized</h1></body></html>');
+}
 
 function checkService(service) {
   return new Promise((resolve) => {
@@ -61,17 +81,42 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+  
+  const needsAuth = config.username && config.password;
+  const hasNoAuth = !config.username || !config.password;
+  
+  if (needsAuth && !checkAuth(req)) {
+    if (req.url === '/settings' || req.url === '/settings.html') {
+      return requireAuth(req, res);
+    }
+    if (req.url === '/api/config' && req.method === 'POST') {
+      return requireAuth(req, res);
+    }
+  }
   
   if (req.url === '/api/status') {
     const status = await checkAllServices();
     res.end(JSON.stringify(status));
-  } else if (req.url === '/api/config') {
+    } else if (req.url === '/api/config') {
     if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk);
       req.on('end', () => {
         try {
           const newConfig = JSON.parse(body);
+          if (!newConfig.password) {
+            newConfig.password = config.password;
+          }
+          if (!newConfig.username) {
+            newConfig.username = config.username;
+          }
           fs.writeFileSync('config.json', JSON.stringify(newConfig, null, 2));
           Object.assign(config, newConfig);
           res.end(JSON.stringify({ success: true }));
@@ -86,6 +131,7 @@ const server = http.createServer(async (req, res) => {
         logo: config.logo,
         refreshInterval: config.refreshInterval,
         timeout: config.timeout,
+        hasAuth: !!(config.username && config.password),
         services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
       }));
     }
