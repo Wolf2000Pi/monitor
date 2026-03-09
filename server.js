@@ -102,6 +102,7 @@ const server = http.createServer(async (req, res) => {
   
   const needsAuth = config.username && config.password;
   
+  // Auth for settings and config
   if (needsAuth && !checkAuth(req)) {
     if (req.url.startsWith('/settings') || 
         req.url.startsWith('/api/config')) {
@@ -109,10 +110,11 @@ const server = http.createServer(async (req, res) => {
     }
   }
   
+  // Public routes
   if (req.url === '/api/status') {
     const status = await checkAllServices();
     res.end(JSON.stringify(status));
-    } else if (req.url === '/api/config') {
+  } else if (req.url === '/' || req.url === '/index.html') {
     if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk);
