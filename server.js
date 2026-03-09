@@ -108,17 +108,16 @@ const server = http.createServer(async (req, res) => {
   
   // Auth for settings and config
   if (needsAuth && !checkAuth(req)) {
-    if (req.url.startsWith('/settings') || 
-        (req.url === '/api/config' && req.method === 'POST')) {
+    if (url.startsWith('/settings') || 
+        (url === '/api/config' && req.method === 'POST')) {
       return requireAuth(req, res);
     }
   }
    
   // Public routes
-  if (req.url === '/api/status') {
-    const status = await checkAllServices();
-    res.end(JSON.stringify(status));
-  } else if (req.url === '/' || req.url === '/index.html') {
+  const url = req.url.split('?')[0]; // Remove query params
+  
+  if (url === '/') {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
       if (err) {
         res.writeHead(500);
@@ -128,7 +127,20 @@ const server = http.createServer(async (req, res) => {
         res.end(data);
       }
     });
-  } else if (req.url === '/settings' || req.url === '/settings.html') {
+  } else if (url === '/index.html') {
+    fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Error loading index.html');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
+  } else if (url === '/api/status') {
+    const status = await checkAllServices();
+    res.end(JSON.stringify(status));
+  } else if (url === '/settings') {
     fs.readFile(path.join(__dirname, 'public', 'settings.html'), (err, data) => {
       if (err) {
         res.writeHead(500);
@@ -138,7 +150,7 @@ const server = http.createServer(async (req, res) => {
         res.end(data);
       }
     });
-  } else if (req.url === '/api/images') {
+  } else if (url === '/api/images') {
     const imagesDir = path.join(__dirname, 'assets', 'img');
     let images = [];
     try {
@@ -149,7 +161,7 @@ const server = http.createServer(async (req, res) => {
       }
     } catch (e) {}
     res.end(JSON.stringify(images.map(f => '/assets/img/' + f)));
-  } else if (req.url === '/api/config') {
+  } else if (url === '/api/config') {
     if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk);
@@ -180,7 +192,7 @@ const server = http.createServer(async (req, res) => {
         services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
       }));
     }
-  } else if (req.url.startsWith('/assets/')) {
+  } else if (url.startsWith('/assets/')) {
     const filePath = path.join(__dirname, req.url);
     const ext = path.extname(filePath);
     const contentTypes = {
