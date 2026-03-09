@@ -113,42 +113,11 @@ const server = http.createServer(async (req, res) => {
       return requireAuth(req, res);
     }
   }
-  
+   
   // Public routes
   if (req.url === '/api/status') {
     const status = await checkAllServices();
     res.end(JSON.stringify(status));
-  } else if (req.url === '/' || req.url === '/index.html') {
-    if (req.method === 'POST') {
-      let body = '';
-      req.on('data', chunk => body += chunk);
-      req.on('end', () => {
-        try {
-          const newConfig = JSON.parse(body);
-          if (!newConfig.password) {
-            newConfig.password = config.password;
-          }
-          if (!newConfig.username) {
-            newConfig.username = config.username;
-          }
-          fs.writeFileSync('config.json', JSON.stringify(newConfig, null, 2));
-          Object.assign(config, newConfig);
-          res.end(JSON.stringify({ success: true }));
-        } catch (e) {
-          res.writeHead(400);
-          res.end(JSON.stringify({ error: e.message }));
-        }
-      });
-    } else {
-      res.end(JSON.stringify({
-        title: config.title || 'Service Monitor',
-        logo: config.logo,
-        refreshInterval: config.refreshInterval,
-        timeout: config.timeout,
-        hasAuth: !!(config.username && config.password),
-        services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
-      }));
-    }
   } else if (req.url === '/' || req.url === '/index.html') {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
       if (err) {
@@ -180,6 +149,37 @@ const server = http.createServer(async (req, res) => {
       }
     } catch (e) {}
     res.end(JSON.stringify(images.map(f => '/assets/img/' + f)));
+  } else if (req.url === '/api/config') {
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const newConfig = JSON.parse(body);
+          if (!newConfig.password) {
+            newConfig.password = config.password;
+          }
+          if (!newConfig.username) {
+            newConfig.username = config.username;
+          }
+          fs.writeFileSync('config.json', JSON.stringify(newConfig, null, 2));
+          Object.assign(config, newConfig);
+          res.end(JSON.stringify({ success: true }));
+        } catch (e) {
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: e.message }));
+        }
+      });
+    } else {
+      res.end(JSON.stringify({
+        title: config.title || 'Service Monitor',
+        logo: config.logo,
+        refreshInterval: config.refreshInterval,
+        timeout: config.timeout,
+        hasAuth: !!(config.username && config.password),
+        services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
+      }));
+    }
   } else if (req.url.startsWith('/assets/')) {
     const filePath = path.join(__dirname, req.url);
     const ext = path.extname(filePath);
