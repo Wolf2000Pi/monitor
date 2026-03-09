@@ -35,7 +35,8 @@ function checkService(service) {
     
     const options = { 
       timeout: config.timeout,
-      rejectUnauthorized: false
+      rejectUnauthorized: false,
+      family: 4
     };
     
     const req = protocol.get(service.url, options, (res) => {
@@ -51,13 +52,14 @@ function checkService(service) {
       });
     });
     
-    req.on('error', () => {
+    req.on('error', (err) => {
       resolve({
         name: service.name,
         url: service.url,
         logo: service.logo,
         status: 'offline',
         statusCode: 0,
+        error: err.code || err.message,
         responseTime: Date.now() - start,
         timestamp: new Date().toISOString()
       });
@@ -71,6 +73,7 @@ function checkService(service) {
         logo: service.logo,
         status: 'offline',
         statusCode: 0,
+        error: 'timeout',
         responseTime: config.timeout,
         timestamp: new Date().toISOString()
       });
