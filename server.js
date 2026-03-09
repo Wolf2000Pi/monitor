@@ -108,9 +108,10 @@ const server = http.createServer(async (req, res) => {
   
   const url = req.url.split('?')[0]; // Remove query params first!
    
-  // Auth for settings and config
+  // Auth for settings and config - only block POST to settings
   if (needsAuth && !checkAuth(req)) {
     if (url.startsWith('/settings') || 
+        url === '/settings.html' ||
         (url === '/api/config' && req.method === 'POST')) {
       return requireAuth(req, res);
     }
