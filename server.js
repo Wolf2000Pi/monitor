@@ -90,13 +90,13 @@ const server = http.createServer(async (req, res) => {
   }
   
   const needsAuth = config.username && config.password;
-  const hasNoAuth = !config.username || !config.password;
   
   if (needsAuth && !checkAuth(req)) {
-    if (req.url === '/settings' || req.url === '/settings.html') {
-      return requireAuth(req, res);
-    }
-    if (req.url === '/api/config' && req.method === 'POST') {
+    if (req.url.startsWith('/settings') || 
+        req.url.startsWith('/api/config') ||
+        req.url === '/' || 
+        req.url === '/index.html' ||
+        req.url === '/api/status') {
       return requireAuth(req, res);
     }
   }
