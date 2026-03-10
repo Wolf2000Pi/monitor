@@ -10,6 +10,7 @@ Einen LXC Contaimer unter Prxmox Debian 13
 ```
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/debian.sh)"
 apt update && apt upgrade -y
+apt install git
 ```
 
 ## 1. Node.js installieren
@@ -20,7 +21,7 @@ sudo apt install nodejs -y
 ## 2. Projekt hochladen
 ```
 cd /opt
-sudo git clone https://github.com/dein-repo/service-monitor.git
+git clone https://github.com/dein-repo/service-monitor.git
 cd service-monitor
 ```
 ## 3. Dependencies installieren
@@ -33,7 +34,7 @@ nano config.json
 ```
 # 5. Starten (mit PM2 für Autostart)
 ```
-sudo npm install -g pm2
+npm install -g pm2
 pm2 start server.js --name monitor
 pm2 startup
 pm2 save
