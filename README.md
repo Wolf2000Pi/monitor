@@ -48,11 +48,11 @@ pm2 save
 ## Zugriff: http://192.168.178.144:3000/settings
 
 ## Features:
-Titel & Logo ändern (sollte wälhe fehlen dann im ordner assets/img hinzufügen.)
-Refresh Interval & Timeout
-Services hinzufügen/entfernen
-Benützer 6 Password (nur für die Settings-Seite)
-Alles speichern
+- Titel & Logo ändern (sollte wälhe fehlen dann im ordner assets/img hinzufügen.)
+- Refresh Interval & Timeout
+- Services hinzufügen/entfernen
+- Benützer 6 Password (nur für die Settings-Seite)
+- Alles speichern
 
 
 
