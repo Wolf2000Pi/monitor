@@ -9,6 +9,8 @@ Monitor ist ein Dashbord für Selfhoster
 Einen LXC Contaimer unter Prxmox Debian 13
 ```
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/debian.sh)"
+```
+apt update && apt upgrade -y
 
 
 
