@@ -29,6 +29,8 @@ cd service-monitor
 npm install
 ```
 ## 4. Config anpassen
+Muss nicht gleich geändert werden, kann im Browsere auch geädert werden:
+http://Deine-IP:3000/settings
 ```
 nano config.json
 ```
@@ -39,4 +41,18 @@ pm2 start server.js --name monitor
 pm2 startup
 pm2 save
 ```
+
+## Der monitor ist erreichbar unter: http://Deine-IP:3000
+# Settings-Seite
+
+# Zugriff: http://192.168.178.144:3000/settings
+
+## Features:
+Titel & Logo ändern (sollte wälhe fehlen dann im ordner assets/img hinzufügen.)
+Refresh Interval & Timeout
+Services hinzufügen/entfernen
+Benützer 6 Password (nur für die Settings-Seite)
+Alles speichern
+
+
 
