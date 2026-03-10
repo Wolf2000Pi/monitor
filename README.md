@@ -24,19 +24,18 @@ sudo git clone https://github.com/dein-repo/service-monitor.git
 cd service-monitor
 ```
 ## 3. Dependencies installieren
-
 ```
 npm install
-
+```
 ## 4. Config anpassen
-
 ```
 nano config.json
-
+```
 # 5. Starten (mit PM2 für Autostart)
-
 ```
 sudo npm install -g pm2
 pm2 start server.js --name monitor
 pm2 startup
 pm2 save
+```
+
