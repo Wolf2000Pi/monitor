@@ -13,3 +13,5 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/Proxmo
 apt update && apt upgrade -y
 
 
+
+
