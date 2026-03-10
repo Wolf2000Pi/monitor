@@ -34,7 +34,7 @@ http://Deine-IP:3000/settings
 ```
 nano config.json
 ```
-# 5. Starten (mit PM2 für Autostart)
+## 5. Starten (mit PM2 für Autostart)
 ```
 npm install -g pm2
 pm2 start server.js --name monitor
@@ -45,7 +45,7 @@ pm2 save
 ## Der monitor ist erreichbar unter: http://Deine-IP:3000
 # Settings-Seite
 
-# Zugriff: http://192.168.178.144:3000/settings
+## Zugriff: http://192.168.178.144:3000/settings
 
 ## Features:
 Titel & Logo ändern (sollte wälhe fehlen dann im ordner assets/img hinzufügen.)
