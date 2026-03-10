@@ -1,9 +1,9 @@
-#  Monitor Dashbord
+#  Monitor Dashboard
 ### Monitor ist so ähnlich wie [Monitorr](https://github.com/Monitorr/Monitorr)
 
 ![bild3](https://github.com/user-attachments/assets/2509faf2-2b43-4491-81d1-c98f64d181af)
 
-Monitor ist ein Dashbord für Selfhoster
+Monitor ist ein Dashboard für Selfhoster
 
 ## Installieren
 Einen LXC Contaimer unter Prxmox Debian 13
@@ -29,7 +29,7 @@ cd service-monitor
 npm install
 ```
 ## 4. Config anpassen
-Muss nicht gleich geändert werden, kann im Browsere auch geädert werden:
+Muss nicht gleich geändert werden, kann im Browser auch geädert werden:
 http://Deine-IP:3000/settings
 ```
 nano config.json
@@ -48,11 +48,13 @@ pm2 save
 ## Zugriff: http://192.168.178.144:3000/settings
 
 ## Features:
-- Titel & Logo ändern (sollte wälhe fehlen dann im ordner assets/img hinzufügen.)
-- Refresh Interval & Timeout
+- Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.)
+- Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
 - Benützer 6 Password (nur für die Settings-Seite)
 - Alles speichern
+
+Dieses Programm wurde teilweise mit OpenCode geschrieben
 
 
 
