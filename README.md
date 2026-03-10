@@ -16,13 +16,13 @@ apt update && apt upgrade -y
 ```
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install nodejs -y
-
+```
 ## 2. Projekt hochladen
 ```
 cd /opt
 sudo git clone https://github.com/dein-repo/service-monitor.git
 cd service-monitor
-
+```
 ## 3. Dependencies installieren
 
 ```
