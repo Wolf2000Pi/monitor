@@ -51,8 +51,12 @@ pm2 save
 - Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.)
 - Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
-- Benützer 6 Password (nur für die Settings-Seite)
+- Benützer Password (nur für die Settings-Seite)
 - Alles speichern
+## Updaten
+```
+npm run update && pm2 restart monitor
+```
 
 Dieses Programm wurde teilweise mit OpenCode geschrieben
 
