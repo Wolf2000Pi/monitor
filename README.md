@@ -59,7 +59,3 @@ npm run update && pm2 restart monitor
 ```
 
 Dieses Programm wurde teilweise mit OpenCode geschrieben
-
-
-
-
