@@ -56,6 +56,8 @@ pm2 save
 - Alles speichern
 ## Updaten
 ```
+cd /opt/monitor/
+```
 npm run update && pm2 restart monitor
 ```
 
