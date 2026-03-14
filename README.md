@@ -57,7 +57,6 @@ pm2 save
 ## Updaten
 ```
 cd /opt/monitor/
-```
 npm run update && pm2 restart monitor
 ```
 
