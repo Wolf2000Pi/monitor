@@ -49,7 +49,7 @@ pm2 save
 ## Zugriff: http://192.168.178.144:3000/settings
 
 ## Features:
-- Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.)
+- Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.(png, jpg, jpeg, gif, ico, svg))
 - Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
 - Benützer Password (nur für die Settings-Seite)
