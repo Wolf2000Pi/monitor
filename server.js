@@ -180,53 +180,9 @@ function createSession(username) {
     username,
     created: Date.now(),
     expires: Date.now() + SESSION_DURATION
-  });
-  return sessionId;
-}
-
-function validateSession(req) {
-  const cookieHeader = req.headers.cookie;
-  if (!cookieHeader) return false;
-  
-  const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
-  const sessionId = cookies.session;
-  
-  if (!sessionId) return false;
-  
-  const session = sessionMap.get(sessionId);
-  if (!session) return false;
-  
-  if (Date.now() > session.expires) {
-    sessionMap.delete(sessionId);
-    return false;
-  }
-  
-  return true;
-}
-
-const server = http.createServer(async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
+    });
     return;
-  }
-  
-  const needsAuth = config.username && config.password;
-  const url = req.url.split('?')[0];
-  const isAuthenticated = needsAuth ? validateSession(req) : true;
-  
-  if (needsAuth && !isAuthenticated && url !== '/login' && url !== '/login.html' && url !== '/api/login') {
-    if (url.startsWith('/api/') && url !== '/api/login') {
-      res.writeHead(401);
-      res.end(JSON.stringify({ error: 'Unauthorized' }));
-      return;
-    }
-    
+  } else if (url === '/login.html' || url === '/login') {
     fs.readFile(path.join(__dirname, 'public', 'login.html'), (err, data) => {
       if (err) {
         res.writeHead(500);
@@ -236,53 +192,6 @@ const server = http.createServer(async (req, res) => {
         res.end(data);
       }
     });
-    return;
-  } else if (url === '/api/login' && req.method === 'POST') {
-    const rateLimit = checkRateLimit(req);
-    if (!rateLimit.allowed) {
-      res.writeHead(429);
-      res.end(JSON.stringify({ error: 'Zu viele Versuche' }));
-      return;
-    }
-    
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Basic ')) {
-      const base64 = authHeader.slice(6);
-      const decoded = Buffer.from(base64, 'base64').toString();
-      const [username, password] = decoded.split(':');
-      
-      if (username === config.username && password === config.password) {
-        clearFailedLogin(req);
-        const sessionId = createSession(username);
-        res.writeHead(200, {
-          'Content-Type': 'application/json',
-          'Set-Cookie': `session=${sessionId}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_DURATION / 1000}`
-        });
-        res.end(JSON.stringify({ success: true }));
-      } else {
-        recordFailedLogin(req);
-        res.writeHead(401);
-        res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
-      }
-    } else {
-      res.writeHead(401);
-      res.end(JSON.stringify({ error: 'No credentials' }));
-    }
-    return;
-  } else if (url === '/api/logout' && req.method === 'POST') {
-    const cookieHeader = req.headers.cookie;
-    if (cookieHeader) {
-      const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
-      const sessionId = cookies.session;
-      if (sessionId) {
-        sessionMap.delete(sessionId);
-      }
-    }
-    res.writeHead(200, {
-      'Content-Type': 'application/json',
-      'Set-Cookie': 'session=; HttpOnly; Path=/; Max-Age=0'
-    });
-    res.end(JSON.stringify({ success: true }));
     return;
   }
    
