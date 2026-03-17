@@ -8,15 +8,90 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 const PORT = process.env.PORT || 3000;
 
+const rateLimitMap = new Map();
+const failBanMap = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000;
+const RATE_LIMIT_MAX = 30;
+const FAIL_BAN_MAX = 5;
+const FAIL_BAN_DURATION = 15 * 60 * 1000;
+
+function getClientIp(req) {
+  return req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+}
+
+function checkRateLimit(req) {
+  const ip = getClientIp(req);
+  const now = Date.now();
+  
+  if (failBanMap.has(ip) && now < failBanMap.get(ip).until) {
+    return { allowed: false, reason: 'banned', until: failBanMap.get(ip).until };
+  }
+  
+  if (failBanMap.has(ip) && now >= failBanMap.get(ip).until) {
+    failBanMap.delete(ip);
+  }
+  
+  const record = rateLimitMap.get(ip) || { count: 0, resetTime: now + RATE_LIMIT_WINDOW };
+  
+  if (now > record.resetTime) {
+    record.count = 1;
+    record.resetTime = now + RATE_LIMIT_WINDOW;
+  } else {
+    record.count++;
+  }
+  
+  rateLimitMap.set(ip, record);
+  
+  if (record.count > RATE_LIMIT_MAX) {
+    return { allowed: false, reason: 'rate_limit' };
+  }
+  
+  return { allowed: true };
+}
+
+function recordFailedLogin(req) {
+  const ip = getClientIp(req);
+  const now = Date.now();
+  const record = failBanMap.get(ip) || { count: 0, until: 0 };
+  
+  record.count++;
+  
+  if (record.count >= FAIL_BAN_MAX) {
+    record.until = now + FAIL_BAN_DURATION;
+    console.log(`IP ${ip} wurde für ${FAIL_BAN_DURATION / 60000} Minuten gebannt`);
+  }
+  
+  failBanMap.set(ip, record);
+}
+
+function clearFailedLogin(req) {
+  const ip = getClientIp(req);
+  failBanMap.delete(ip);
+  rateLimitMap.delete(ip);
+}
+
 function checkAuth(req) {
+  const rateLimit = checkRateLimit(req);
+  if (!rateLimit.allowed) {
+    return { valid: false, rateLimited: true, reason: rateLimit.reason };
+  }
+  
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Basic ')) return false;
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    return { valid: false, rateLimited: false };
+  }
   
   const base64 = authHeader.slice(6);
   const decoded = Buffer.from(base64, 'base64').toString();
   const [username, password] = decoded.split(':');
   
-  return username === config.username && password === config.password;
+  if (username === config.username && password === config.password) {
+    clearFailedLogin(req);
+    return { valid: true, rateLimited: false };
+  } else {
+    recordFailedLogin(req);
+    return { valid: false, rateLimited: false };
+  }
 }
 
 function requireAuth(req, res) {
@@ -92,10 +167,47 @@ async function checkAllServices() {
   return results;
 }
 
+const sessionMap = new Map();
+const SESSION_DURATION = 24 * 60 * 60 * 1000;
+
+function generateSessionId() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function createSession(username) {
+  const sessionId = generateSessionId();
+  sessionMap.set(sessionId, {
+    username,
+    created: Date.now(),
+    expires: Date.now() + SESSION_DURATION
+  });
+  return sessionId;
+}
+
+function validateSession(req) {
+  const cookieHeader = req.headers.cookie;
+  if (!cookieHeader) return false;
+  
+  const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
+  const sessionId = cookies.session;
+  
+  if (!sessionId) return false;
+  
+  const session = sessionMap.get(sessionId);
+  if (!session) return false;
+  
+  if (Date.now() > session.expires) {
+    sessionMap.delete(sessionId);
+    return false;
+  }
+  
+  return true;
+}
+
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   if (req.method === 'OPTIONS') {
@@ -105,15 +217,58 @@ const server = http.createServer(async (req, res) => {
   }
   
   const needsAuth = config.username && config.password;
-  
   const url = req.url.split('?')[0];
-   
-  if (needsAuth && !checkAuth(req)) {
-    if (url.startsWith('/settings') || 
-        url === '/settings.html' ||
-        (url === '/api/config' && req.method === 'POST')) {
-      return requireAuth(req, res);
+  const isAuthenticated = needsAuth ? validateSession(req) : true;
+  
+  if (needsAuth && !isAuthenticated && url !== '/login' && url !== '/login.html' && url !== '/api/login') {
+    if (url.startsWith('/api/') && url !== '/api/login') {
+      res.writeHead(401);
+      res.end(JSON.stringify({ error: 'Unauthorized' }));
+      return;
     }
+    
+    fs.readFile(path.join(__dirname, 'public', 'login.html'), (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Error loading login.html');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
+    return;
+  } else if (url === '/api/login' && req.method === 'POST') {
+    const rateLimit = checkRateLimit(req);
+    if (!rateLimit.allowed) {
+      res.writeHead(429);
+      res.end(JSON.stringify({ error: 'Zu viele Versuche' }));
+      return;
+    }
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Basic ')) {
+      const base64 = authHeader.slice(6);
+      const decoded = Buffer.from(base64, 'base64').toString();
+      const [username, password] = decoded.split(':');
+      
+      if (username === config.username && password === config.password) {
+        clearFailedLogin(req);
+        const sessionId = createSession(username);
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Set-Cookie': `session=${sessionId}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_DURATION / 1000}`
+        });
+        res.end(JSON.stringify({ success: true }));
+      } else {
+        recordFailedLogin(req);
+        res.writeHead(401);
+        res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      }
+    } else {
+      res.writeHead(401);
+      res.end(JSON.stringify({ error: 'No credentials' }));
+    }
+    return;
   }
    
   if (url === '/') {
