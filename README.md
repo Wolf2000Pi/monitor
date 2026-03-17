@@ -1,4 +1,5 @@
 #  Monitor Dashboard
+### [Englisch](https://github.com/Wolf2000Pi/monitor/blob/main/README.en.md)
 ### Monitor ist so ähnlich wie [Monitorr](https://github.com/Monitorr/Monitorr)
 
 ![bild3](https://github.com/user-attachments/assets/2509faf2-2b43-4491-81d1-c98f64d181af)
@@ -48,13 +49,14 @@ pm2 save
 ## Zugriff: http://192.168.178.144:3000/settings
 
 ## Features:
-- Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.)
+- Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.(png, jpg, jpeg, gif, ico, svg))
 - Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
 - Benützer Password (nur für die Settings-Seite)
 - Alles speichern
 ## Updaten
 ```
+cd /opt/monitor/
 npm run update && pm2 restart monitor
 ```
 

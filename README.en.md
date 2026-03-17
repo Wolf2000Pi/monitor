@@ -48,13 +48,14 @@ pm2 save
 ## Access: http://192.168.178.144:3000/settings
 
 ## Features:
-- Change title & logo (add to assets/img folder if any are missing)
+- Change title & logo (add to assets/img folder if any are missing (png, jpg, jpeg, gif, ico, svg))
 - Refresh interval & timeout
 - Add/remove services
 - User password (only for the settings page)
 - Save everything
 ## Update
 ```
+cd /opt/monitor/
 npm run update && pm2 restart monitor
 ```
 
