@@ -180,22 +180,11 @@ function createSession(username) {
     username,
     created: Date.now(),
     expires: Date.now() + SESSION_DURATION
-    });
-    return;
-  } else if (url === '/login.html' || url === '/login') {
-    fs.readFile(path.join(__dirname, 'public', 'login.html'), (err, data) => {
-      if (err) {
-        res.writeHead(500);
-        res.end('Error loading login.html');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(data);
-      }
-    });
-    return;
-  }
-   
-  if (url === '/') {
+  });
+  return sessionId;
+}
+
+function validateSession(req) {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
       if (err) {
         res.writeHead(500);
@@ -223,6 +212,16 @@ function createSession(username) {
       if (err) {
         res.writeHead(500);
         res.end('Error loading settings.html');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
+  } else if (url === '/login.html' || url === '/login') {
+    fs.readFile(path.join(__dirname, 'public', 'login.html'), (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Error loading login.html');
       } else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(data);
