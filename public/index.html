@@ -121,7 +121,7 @@
     let config = { refreshInterval: 30000 };
     
     async function loadConfig() {
-      const res = await fetch('/api/config');
+      const res = await fetch('/api/config', { credentials: 'include' });
       if (res.status === 401) {
         window.location.href = '/login.html';
         return;
@@ -142,7 +142,7 @@
     
     async function fetchStatus() {
       try {
-        const res = await fetch('/api/status');
+        const res = await fetch('/api/status', { credentials: 'include' });
         if (res.status === 401) {
           window.location.href = '/login.html';
           return;

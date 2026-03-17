@@ -100,6 +100,7 @@
       try {
         const response = await fetch('/api/login', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Authorization': 'Basic ' + credentials
           }
