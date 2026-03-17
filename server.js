@@ -269,6 +269,21 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ error: 'No credentials' }));
     }
     return;
+  } else if (url === '/api/logout' && req.method === 'POST') {
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader) {
+      const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
+      const sessionId = cookies.session;
+      if (sessionId) {
+        sessionMap.delete(sessionId);
+      }
+    }
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Set-Cookie': 'session=; HttpOnly; Path=/; Max-Age=0'
+    });
+    res.end(JSON.stringify({ success: true }));
+    return;
   }
    
   if (url === '/') {

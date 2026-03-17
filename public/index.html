@@ -16,7 +16,11 @@
       padding: 20px;
     }
     .header { text-align: center; margin-bottom: 30px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 30px; }
+    .header .header-content { text-align: center; flex: 1; }
     .header img { height: 60px; margin-bottom: 10px; }
+    .logout-link { color: #ff4757; text-decoration: none; font-size: 14px; padding: 8px 16px; }
+    .logout-link:hover { text-decoration: underline; }
     h1 { color: #c1cbcd; }
     .status-bar {
       text-align: center;
@@ -88,9 +92,13 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <img id="logo" src="" alt="Logo" style="display:none">
-    <h1 id="title">Service Monitor</h1>
+  <div class="header-top">
+    <div></div>
+    <div class="header-content">
+      <img id="logo" src="" alt="Logo" style="display:none">
+      <h1 id="title">Service Monitor</h1>
+    </div>
+    <a href="#" class="logout-link" id="logoutLink">Abmelden</a>
   </div>
   <div class="status-bar">
     <span class="online-count">Online: <strong id="online">0</strong></span>
@@ -179,6 +187,27 @@
       document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
     }
     
+    document.getElementById('logoutLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+      } catch (err) {}
+      window.location.href = '/login.html';
+    });
+    
+    async function checkAuth() {
+      const res = await fetch('/api/config');
+      if (res.status === 401) {
+        window.location.href = '/login.html';
+        return;
+      }
+      const data = await res.json();
+      if (!data.hasAuth) {
+        document.getElementById('logoutLink').style.display = 'none';
+      }
+    }
+    
+    checkAuth();
     loadConfig().then(() => {
       fetchStatus();
       setInterval(fetchStatus, config.refreshInterval);
