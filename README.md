@@ -52,8 +52,7 @@ pm2 save
 - Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.(png, jpg, jpeg, gif, ico, svg))
 - Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
-- Benützer Password (nur für die Settings-Seite)
-- Alles speichern
+- Benützer Password
 ## Updaten
 ```
 cd /opt/monitor/
