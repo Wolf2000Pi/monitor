@@ -7,7 +7,7 @@
 Monitor ist ein Dashboard für Selfhoster
 
 ## Installieren
-Einen LXC Contaimer unter Prxmox Debian 13
+Einen LXC Contaimer unter Proxmox Debian 13
 ```
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/debian.sh)"
 apt update && apt upgrade -y
@@ -52,8 +52,7 @@ pm2 save
 - Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.(png, jpg, jpeg, gif, ico, svg))
 - Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
-- Benützer Password (nur für die Settings-Seite)
-- Alles speichern
+- Benützer Password
 ## Updaten
 ```
 cd /opt/monitor/
