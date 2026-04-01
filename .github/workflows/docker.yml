@@ -19,11 +19,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       
-      - name: Debug secrets
-        run: |
-          echo "Docker Hub Username set: ${{ secrets.DOCKERHUB_USERNAME != '' }}"
-          echo "Docker Hub Token set: ${{ secrets.DOCKERHUB_TOKEN != '' }}"
-      
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -38,3 +33,25 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/monitor:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Fix config.json on server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/monitor
+            if [ -d "config.json" ]; then
+              rm -rf config.json
+              echo '{"title":"Mein Monitor","logo":"/assets/logo.png","username":"","password":"","refreshInterval":30000,"timeout":5000,"services":[]}' > config.json
+            fi
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/monitor:latest
+            docker stop monitor || true
+            docker rm monitor || true
+            docker run -d --name monitor -p 3000:3000 --restart unless-stopped -v $(pwd)/config.json:/app/config.json ${{ secrets.DOCKERHUB_USERNAME }}/monitor:latest
