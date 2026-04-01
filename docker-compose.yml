@@ -1,6 +1,6 @@
 services:
   monitor:
-    build: .
+    image: bigwolf2000/monitor:latest
     container_name: monitor
     restart: unless-stopped
     ports:
