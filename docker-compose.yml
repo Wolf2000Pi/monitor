@@ -6,7 +6,4 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./config.json:/app/config.json:ro
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
+      - ./config.json:/app/config.json
