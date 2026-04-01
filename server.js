@@ -133,7 +133,6 @@ function checkService(service) {
     });
     
     req.on('error', (err) => {
-      console.error(`Error ${service.name}:`, err.code);
       resolve({
         name: service.name,
         url: service.url,
