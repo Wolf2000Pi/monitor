@@ -1,0 +1,12 @@
+services:
+  monitor:
+    build: .
+    container_name: monitor
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config.json:/app/config.json:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
