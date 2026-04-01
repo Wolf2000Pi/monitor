@@ -7,7 +7,7 @@ RUN apk add --no-cache tini
 COPY package.json server.js update.js ./
 COPY public ./public
 COPY assets ./assets
-COPY config.json config.json ./
+COPY config.json ./config.json
 
 RUN chown -R node:node /app
 
