@@ -4,6 +4,19 @@
 ![bild3](https://github.com/user-attachments/assets/2509faf2-2b43-4491-81d1-c98f64d181af)
 
 Monitor is a dashboard for self-hosters
+## Docker compose
+```
+services:
+  monitor:
+    container_name: monitor
+    restart: unless-stopped
+    network_mode: host
+    image: bigwolf2000/monitor:latest
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    dns_search: .
+```
 
 ## Install
 An LXC container on Proxmox Debian 13
