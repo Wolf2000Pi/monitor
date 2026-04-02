@@ -4,3 +4,7 @@ services:
     restart: unless-stopped
     network_mode: host
     image: bigwolf2000/monitor:latest
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    dns_search: .
