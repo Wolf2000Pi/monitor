@@ -11,8 +11,11 @@ COPY config.json ./
 
 RUN chmod 644 config.json && chown node:node config.json
 
-USER node
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'echo "nameserver 8.8.8.8" > /etc/resolv.conf' >> /start.sh && \
+    echo 'exec node server.js' >> /start.sh && \
+    chmod +x /start.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["node", "server.js"]
+ENTRYPOINT ["/start.sh"]
