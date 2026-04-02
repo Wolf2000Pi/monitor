@@ -1,10 +1,6 @@
 services:
   monitor:
     container_name: monitor
-    ports:
-      - "3000:3000"
     restart: unless-stopped
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+    network_mode: host
     image: bigwolf2000/monitor:latest
