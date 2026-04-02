@@ -45,7 +45,7 @@ pm2 save
 ## The monitor is accessible at: http://Your-IP:3000
 # Settings page
 
-## Access: http://192.168.178.144:3000/settings
+## Access: http://Your-IP:3000/settings
 
 ## Features:
 - Change title & logo (add to assets/img folder if any are missing (png, jpg, jpeg, gif, ico, svg))
