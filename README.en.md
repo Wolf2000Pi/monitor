@@ -34,7 +34,7 @@ sudo apt install nodejs -y
 ## 2. Upload project
 ```
 cd /opt
-git clone https://github.com/your-repo/service-monitor.git
+git clone https://github.com/Wolf2000Pi/monitor.git
 cd service-monitor
 ```
 ## 3. Install dependencies
