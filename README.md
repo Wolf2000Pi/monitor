@@ -32,7 +32,7 @@ apt install git
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install nodejs -y
 ```
-Läuft auch mit Nodes 24.X
+Läuft auch mit Nodes 24.x
 ```
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt install nodejs -y
