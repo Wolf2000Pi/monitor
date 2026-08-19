@@ -5,6 +5,19 @@
 ![bild3](https://github.com/user-attachments/assets/2509faf2-2b43-4491-81d1-c98f64d181af)
 
 Monitor ist ein Dashboard für Selfhoster
+## Docker compose
+```
+services:
+  monitor:
+    container_name: monitor
+    restart: unless-stopped
+    network_mode: host
+    image: bigwolf2000/monitor:latest
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    dns_search: .
+```
 
 ## Installieren
 Einen LXC Contaimer unter Proxmox Debian 13
@@ -19,10 +32,16 @@ apt install git
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install nodejs -y
 ```
+Läuft auch mit Nodes 24.x
+```
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt install nodejs -y
+```
+
 ## 2. Projekt hochladen
 ```
 cd /opt
-git clone https://github.com/dein-repo/service-monitor.git
+git clone https://github.com/Wolf2000Pi/monitor.git
 cd service-monitor
 ```
 ## 3. Dependencies installieren
@@ -46,7 +65,7 @@ pm2 save
 ## Der monitor ist erreichbar unter: http://Deine-IP:3000
 # Settings-Seite
 
-## Zugriff: http://192.168.178.144:3000/settings
+## Zugriff: http://Deine-IP:3000/settings
 
 ## Features:
 - Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.(png, jpg, jpeg, gif, ico, svg))
