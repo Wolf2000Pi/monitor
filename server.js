@@ -315,11 +315,18 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ error: 'Datei zu groß (max. 5 MB)' }));
         return;
       }
-      const dest = path.join(__dirname, 'assets', 'img', safeName);
+      const imagesDir = path.join(__dirname, 'assets', 'img');
+      try {
+        fs.mkdirSync(imagesDir, { recursive: true });
+      } catch (mkdirErr) {
+        console.error('Konnte assets/img nicht anlegen:', mkdirErr);
+      }
+      const dest = path.join(imagesDir, safeName);
       fs.writeFile(dest, Buffer.concat(chunks), (err) => {
         if (err) {
+          console.error(`Upload fehlgeschlagen (${safeName}):`, err);
           res.writeHead(500);
-          res.end(JSON.stringify({ error: 'Fehler beim Speichern' }));
+          res.end(JSON.stringify({ error: 'Fehler beim Speichern: ' + (err.code || err.message) }));
         } else {
           console.log(`Bild hochgeladen: ${safeName}`);
           res.writeHead(200, { 'Content-Type': 'application/json' });
