@@ -10,6 +10,7 @@ COPY assets ./assets
 COPY config.json ./
 
 RUN chmod 644 config.json && chown node:node config.json
+RUN chown -R node:node /app/assets/img
 
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'echo "nameserver 8.8.8.8" > /etc/resolv.conf' >> /start.sh && \
