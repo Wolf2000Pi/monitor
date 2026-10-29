@@ -17,7 +17,11 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     dns_search: .
+    volumes:
+      - imgdata:/app/assets/img
 ```
+
+Das Volume sorgt dafür, dass hochgeladene Bilder (und die mitgelieferten Logos) ein Docker-Image-Update überleben.
 
 ## Installieren
 Einen LXC Contaimer unter Proxmox Debian 13
@@ -68,7 +72,8 @@ pm2 save
 ## Zugriff: http://Deine-IP:3000/settings
 
 ## Features:
-- Titel & Logo ändern (sollte welche fehlen dann im Ordner assets/img hinzufügen.(png, jpg, jpeg, gif, ico, svg))
+- Titel & Logo ändern
+- Bilder direkt über die Settings-Seite hochladen (png, jpg, jpeg, gif, ico, svg, webp, max. 5 MB) – die landen automatisch in assets/img
 - Refresh Intervall & Timeout
 - Services hinzufügen/entfernen
 - Benützer Password

@@ -283,9 +283,51 @@ const server = http.createServer(async (req, res) => {
     });
     res.end(JSON.stringify({ success: true }));
     return;
-  }
-   
-  if (url === '/') {
+  } else if (url === '/api/upload' && req.method === 'POST') {
+    const allowedExt = ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.webp'];
+    const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
+
+    const rawName = new URL(req.url, 'http://localhost').searchParams.get('filename') || '';
+    const safeName = path.basename(rawName).replace(/[^\w.\- ]/g, '_').trim();
+    const ext = path.extname(safeName).toLowerCase();
+
+    if (!safeName || !allowedExt.includes(ext)) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Ungültiger Dateiname oder Dateityp (erlaubt: png, jpg, jpeg, gif, ico, svg, webp)' }));
+      return;
+    }
+
+    const chunks = [];
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', chunk => {
+      size += chunk.length;
+      if (size > MAX_UPLOAD_SIZE) {
+        tooLarge = true;
+        chunks.length = 0;
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      if (tooLarge) {
+        res.writeHead(413);
+        res.end(JSON.stringify({ error: 'Datei zu groß (max. 5 MB)' }));
+        return;
+      }
+      const dest = path.join(__dirname, 'assets', 'img', safeName);
+      fs.writeFile(dest, Buffer.concat(chunks), (err) => {
+        if (err) {
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Fehler beim Speichern' }));
+        } else {
+          console.log(`Bild hochgeladen: ${safeName}`);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, file: '/assets/img/' + safeName }));
+        }
+      });
+    });
+  } else if (url === '/') {
     fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, data) => {
       if (err) {
         res.writeHead(500);
@@ -334,7 +376,7 @@ const server = http.createServer(async (req, res) => {
     try {
       if (fs.existsSync(imagesDir)) {
         images = fs.readdirSync(imagesDir).filter(f => 
-          ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg'].includes(path.extname(f).toLowerCase())
+          ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.webp'].includes(path.extname(f).toLowerCase())
         );
       }
     } catch (e) {}
@@ -379,7 +421,8 @@ const server = http.createServer(async (req, res) => {
       '.jpeg': 'image/jpeg',
       '.gif': 'image/gif',
       '.ico': 'image/x-icon',
-      '.svg': 'image/svg+xml'
+      '.svg': 'image/svg+xml',
+      '.webp': 'image/webp'
     };
     fs.readFile(filePath, (err, data) => {
       if (err) {

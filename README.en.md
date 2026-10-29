@@ -16,7 +16,11 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     dns_search: .
+    volumes:
+      - imgdata:/app/assets/img
 ```
+
+The volume ensures uploaded images (and the bundled logos) survive a Docker image update.
 
 ## Install
 An LXC container on Proxmox Debian 13
@@ -66,7 +70,8 @@ pm2 save
 ## Access: http://Your-IP:3000/settings
 
 ## Features:
-- Change title & logo (add to assets/img folder if any are missing (png, jpg, jpeg, gif, ico, svg))
+- Change title & logo
+- Upload images directly via the settings page (png, jpg, jpeg, gif, ico, svg, webp, max. 5 MB) – they are saved to assets/img automatically
 - Refresh interval & timeout
 - Add/remove services
 - User password

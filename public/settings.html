@@ -33,6 +33,16 @@
       color: #fff;
       font-size: 14px;
     }
+    input[type="file"] {
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px dashed #444;
+      border-radius: 6px;
+      background: #333;
+      color: #aaa;
+      font-size: 14px;
+      width: 100%;
+    }
     select { cursor: pointer; }
     .logo-select-wrapper { display: flex; gap: 10px; }
     .logo-select-wrapper select { flex: 1; }
@@ -90,6 +100,10 @@
       
       <label>Logo</label>
       <select id="logo"></select>
+      
+      <label>Bild hochladen</label>
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.ico,.svg,.webp">
+      <button class="btn btn-add" onclick="uploadImage()">Bild hochladen</button>
       
       <label>Benutzername</label>
       <input type="text" id="username" placeholder="admin">
@@ -231,6 +245,51 @@
         msg.className = 'message error';
         msg.textContent = 'Fehler: ' + e.message;
       }
+    }
+    
+    function showMessage(type, text) {
+      const msg = document.getElementById('message');
+      msg.className = 'message ' + type;
+      msg.textContent = text;
+    }
+    
+    async function uploadImage() {
+      const input = document.getElementById('fileInput');
+      const file = input.files && input.files[0];
+      if (!file) {
+        showMessage('error', 'Bitte zuerst eine Datei auswählen!');
+        return;
+      }
+      try {
+        const res = await fetch('/api/upload?filename=' + encodeURIComponent(file.name), {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/octet-stream' },
+          body: file
+        });
+        const result = await res.json();
+        if (result.success) {
+          showMessage('success', 'Bild hochgeladen: ' + file.name);
+          input.value = '';
+          await loadImages();
+          buildLogoSelects();
+        } else {
+          showMessage('error', 'Fehler: ' + result.error);
+        }
+      } catch (e) {
+        showMessage('error', 'Fehler: ' + e.message);
+      }
+    }
+    
+    function buildLogoSelects() {
+      const mainSelect = document.getElementById('logo');
+      const current = mainSelect.value;
+      mainSelect.innerHTML = createLogoSelect(current);
+      
+      document.querySelectorAll('.logo-select').forEach(sel => {
+        const cur = sel.value;
+        sel.innerHTML = createLogoSelect(cur);
+      });
     }
     
     loadConfig();

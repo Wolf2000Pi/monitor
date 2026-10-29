@@ -8,3 +8,8 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     dns_search: .
+    volumes:
+      - imgdata:/app/assets/img
+
+volumes:
+  imgdata:
