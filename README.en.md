@@ -75,10 +75,13 @@ pm2 save
 - Refresh interval & timeout
 - Add/remove services
 - User password
+- Multilingual: German, English, Dutch, Polish, Hungarian, Czech, Slovak, Spanish, French (language selector at the top right on all pages, translations in `public/i18n.js`)
+
 ## Update
 ```
 cd /opt/monitor/
 npm run update && pm2 restart monitor
 ```
+**Important:** After every update, restart the server (`pm2 restart monitor`), otherwise new features such as the language selector will be missing. Then reload the browser with Ctrl+F5.
 
 This program was partially written with OpenCode
