@@ -419,6 +419,16 @@ const server = http.createServer(async (req, res) => {
         services: config.services.map(s => ({ name: s.name, url: s.url, logo: s.logo }))
       }));
     }
+  } else if (url === '/i18n.js') {
+    fs.readFile(path.join(__dirname, 'public', 'i18n.js'), (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end('Not found');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+        res.end(data);
+      }
+    });
   } else if (url.startsWith('/assets/')) {
     const filePath = path.join(__dirname, req.url);
     const ext = path.extname(filePath);

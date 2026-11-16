@@ -88,34 +88,42 @@
     .logout-link { display: block; text-align: center; color: #ff4757; text-decoration: none; margin-top: 30px; }
     p { margin-bottom: 10px; }
     .logout-link:hover { text-decoration: underline; margin-top: 30px; }
+    .lang-select { position: fixed; top: 12px; right: 12px; padding: 6px; border-radius: 6px; border: 1px solid #444; background: #333; color: #fff; font-size: 14px; }
   </style>
 </head>
 <body>
+  <select id="langSelect" class="lang-select" onchange="setLang(this.value)"></select>
   <div class="header">
     <img id="logo" src="" alt="Logo" style="display:none">
     <h1 id="title">Service Monitor</h1>
   </div>
   <div class="status-bar">
-    <span class="online-count">Online: <strong id="online">0</strong></span>
-    <span class="offline-count">Offline: <strong id="offline">0</strong></span>
+    <span class="online-count"><span data-i18n="index.online">Online</span>: <strong id="online">0</strong></span>
+    <span class="offline-count"><span data-i18n="index.offline">Offline</span>: <strong id="offline">0</strong></span>
   </div>
   <div class="grid" id="grid"></div>
   <div class="last-updated">
-    Letzte Aktualisierung: <span id="lastUpdate">-</span>
+    <span data-i18n="index.lastUpdate">Letzte Aktualisierung</span>: <span id="lastUpdate">-</span>
   </div>
   <div style="text-align:center; margin-bottom: 20px;">
-  <a href="#" class="logout-link" id="logoutLink">Abmelden</a>
+  <a href="#" class="logout-link" id="logoutLink" data-i18n="index.logout">Abmelden</a>
   <p></p>
   <div style="text-align:center; margin-bottom: 10px;">
-  <a href="/settings" style="color: #00d9ff; font-size: 0.9em;">Einstellungen</a>
+  <a href="/settings" data-i18n="index.settings" style="color: #00d9ff; font-size: 0.9em;">Einstellungen</a>
   </div>
 
   <div style="text-align:center; margin-top: 10px;">
   Copyright©Bigwolf2000
   </div>
 
+  <script src="/i18n.js"></script>
   <script>
     let config = { refreshInterval: 30000 };
+    let lastServices = null;
+
+    window.onLangChange = () => {
+      if (lastServices) render(lastServices);
+    };
     
     async function loadConfig() {
       const res = await fetch('/api/config', { credentials: 'include' });
@@ -145,6 +153,7 @@
           return;
         }
         const data = await res.json();
+        lastServices = data;
         render(data);
       } catch (e) {
         console.error('Error fetching status:', e);
@@ -172,7 +181,7 @@
             <div class="card-name">${s.name}</div>
           </div>
           <div class="card-footer">
-            <span class="card-status">${s.status.toUpperCase()}</span>
+            <span class="card-status">${s.status === 'online' ? t('index.statusOnline') : t('index.statusOffline')}</span>
             <span class="card-response">${s.responseTime}ms</span>
           </div>
         `;

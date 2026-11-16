@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Monitor</title>
+  <title data-i18n="login.pageTitle">Login - Monitor</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -71,6 +71,7 @@
       transition: background 0.2s;
     }
     button:hover { background: #357abd; }
+    .lang-select { position: fixed; top: 12px; right: 12px; padding: 6px; border-radius: 6px; border: 1px solid #ccc; background: #fff; color: #333; font-size: 14px; width: auto; margin: 0; }
   </style>
 </head>
 <body>
@@ -78,14 +79,16 @@
     <div class="logo">
       <img src="/assets/logo.png" alt="Logo" onerror="this.style.display='none'">
     </div>
-    <h1>Anmelden</h1>
-    <div class="error" id="error">Benutzername oder Passwort falsch</div>
+    <h1 data-i18n="login.heading">Anmelden</h1>
+    <div class="error" id="error" data-i18n="login.error">Benutzername oder Passwort falsch</div>
     <form id="loginForm">
-      <input type="text" id="username" name="username" placeholder="Benutzername" required autocomplete="username">
-      <input type="password" id="password" name="password" placeholder="Passwort" required autocomplete="current-password">
-      <button type="submit">Anmelden</button>
+      <input type="text" id="username" name="username" data-i18n-placeholder="login.username" placeholder="Benutzername" required autocomplete="username">
+      <input type="password" id="password" name="password" data-i18n-placeholder="login.password" placeholder="Passwort" required autocomplete="current-password">
+      <button type="submit" data-i18n="login.submit">Anmelden</button>
     </form>
   </div>
+  <select id="langSelect" class="lang-select" onchange="setLang(this.value)"></select>
+  <script src="/i18n.js"></script>
   <script>
     const form = document.getElementById('loginForm');
     const error = document.getElementById('error');

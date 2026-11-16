@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Einstellungen - Service Monitor</title>
+  <title data-i18n="settings.pageTitle">Einstellungen - Service Monitor</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -83,51 +83,54 @@
     }
     .message.success { background: #00ff8822; color: #00ff88; display: block; }
     .message.error { background: #ff475722; color: #ff4757; display: block; }
+    .lang-select { position: fixed; top: 12px; right: 12px; padding: 6px; border-radius: 6px; border: 1px solid #444; background: #333; color: #fff; font-size: 14px; width: auto; margin: 0; }
   </style>
 </head>
 <body>
+  <select id="langSelect" class="lang-select" onchange="setLang(this.value)"></select>
   <div class="container">
     <div class="nav">
-      <a href="/">&larr; Zurück zum Monitor</a>
+      <a href="/" data-i18n="settings.back">&larr; Zurück zum Monitor</a>
     </div>
-    <h1>Einstellungen</h1>
+    <h1 data-i18n="settings.heading">Einstellungen</h1>
     
     <div id="message" class="message"></div>
     
     <div class="card">
-      <h2>Allgemein</h2>
-      <label>Titel</label>
-      <input type="text" id="title" placeholder="Mein Monitor">
+      <h2 data-i18n="settings.general">Allgemein</h2>
+      <label data-i18n="settings.title">Titel</label>
+      <input type="text" id="title" data-i18n-placeholder="settings.titlePlaceholder" placeholder="Mein Monitor">
       
-      <label>Logo</label>
+      <label data-i18n="settings.logo">Logo</label>
       <select id="logo"></select>
       
-      <label>Bild hochladen</label>
+      <label data-i18n="settings.uploadLabel">Bild hochladen</label>
       <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.ico,.svg,.webp">
-      <button class="btn btn-add btn-upload" onclick="uploadImage()">Bild hochladen</button>
+      <button class="btn btn-add btn-upload" data-i18n="settings.upload" onclick="uploadImage()">Bild hochladen</button>
       
-      <label>Benutzername</label>
+      <label data-i18n="settings.username">Benutzername</label>
       <input type="text" id="username" placeholder="admin">
       
-      <label>Passwort</label>
-      <input type="password" id="password" placeholder="Passwort">
+      <label data-i18n="settings.password">Passwort</label>
+      <input type="password" id="password" data-i18n-placeholder="settings.passwordPlaceholder" placeholder="Passwort">
       
-      <label>Refresh Interval (ms)</label>
+      <label data-i18n="settings.refresh">Refresh Interval (ms)</label>
       <input type="number" id="refreshInterval" value="30000">
       
-      <label>Timeout (ms)</label>
+      <label data-i18n="settings.timeout">Timeout (ms)</label>
       <input type="number" id="timeout" value="5000">
     </div>
     
     <div class="card">
-      <h2>Services</h2>
+      <h2 data-i18n="settings.services">Services</h2>
       <div id="services"></div>
-      <button class="btn btn-add" onclick="addService()">+ Service hinzufügen</button>
+      <button class="btn btn-add" data-i18n="settings.addService" onclick="addService()">+ Service hinzufügen</button>
     </div>
     
-    <button class="btn btn-success" onclick="saveConfig()">Speichern</button>
+    <button class="btn btn-success" data-i18n="settings.save" onclick="saveConfig()">Speichern</button>
   </div>
 
+  <script src="/i18n.js"></script>
   <script>
     let config = {};
     let images = [];
@@ -142,7 +145,7 @@
     }
     
     function createLogoSelect(selected = '') {
-      let options = '<option value="">-- Kein Logo --</option>';
+      let options = `<option value="">${t('settings.noLogo')}</option>`;
       images.forEach(img => {
         const selectedAttr = img === selected ? ' selected' : '';
         options += `<option value="${img}"${selectedAttr}>${img.split('/').pop()}</option>`;
@@ -164,11 +167,10 @@
       document.getElementById('logo').innerHTML = createLogoSelect(config.logo);
       document.getElementById('username').value = config.username || '';
       document.getElementById('password').value = '';
-      document.getElementById('password').placeholder = config.hasAuth ? 'Passwort ändern' : 'Passwort';
+      window.hasAuth = config.hasAuth || false;
+      updatePasswordPlaceholder();
       document.getElementById('refreshInterval').value = config.refreshInterval || 30000;
       document.getElementById('timeout').value = config.timeout || 5000;
-      
-      window.hasAuth = config.hasAuth || false;
       
       const servicesDiv = document.getElementById('services');
       servicesDiv.innerHTML = '';
@@ -178,11 +180,15 @@
       });
     }
     
+    function updatePasswordPlaceholder() {
+      document.getElementById('password').placeholder = window.hasAuth ? t('settings.passwordChange') : t('settings.password');
+    }
+    
     function addService(name = '', url = '', logo = '') {
       const div = document.createElement('div');
       div.className = 'service-row';
       div.innerHTML = `
-        <input type="text" placeholder="Name" value="${name}">
+        <input type="text" class="service-name" placeholder="${t('settings.name')}" value="${name}">
         <input type="url" placeholder="URL" value="${url}">
         <select class="logo-select">${createLogoSelect(logo)}</select>
         <button class="btn btn-danger btn-remove" onclick="this.parentElement.remove()">✕</button>
@@ -236,15 +242,15 @@
         const msg = document.getElementById('message');
         if (result.success) {
           msg.className = 'message success';
-          msg.textContent = 'Einstellungen gespeichert!';
+          msg.textContent = t('settings.saved');
         } else {
           msg.className = 'message error';
-          msg.textContent = 'Fehler: ' + result.error;
+          msg.textContent = t('common.error') + ': ' + result.error;
         }
       } catch (e) {
         const msg = document.getElementById('message');
         msg.className = 'message error';
-        msg.textContent = 'Fehler: ' + e.message;
+        msg.textContent = t('common.error') + ': ' + e.message;
       }
     }
     
@@ -258,7 +264,7 @@
       const input = document.getElementById('fileInput');
       const file = input.files && input.files[0];
       if (!file) {
-        showMessage('error', 'Bitte zuerst eine Datei auswählen!');
+        showMessage('error', t('settings.selectFirst'));
         return;
       }
       try {
@@ -270,15 +276,15 @@
         });
         const result = await res.json();
         if (result.success) {
-          showMessage('success', 'Bild hochgeladen: ' + file.name);
+          showMessage('success', t('settings.uploaded') + file.name);
           input.value = '';
           await loadImages();
           buildLogoSelects();
         } else {
-          showMessage('error', 'Fehler: ' + result.error);
+          showMessage('error', t('common.error') + ': ' + result.error);
         }
       } catch (e) {
-        showMessage('error', 'Fehler: ' + e.message);
+        showMessage('error', t('common.error') + ': ' + e.message);
       }
     }
     
@@ -292,6 +298,13 @@
         sel.innerHTML = createLogoSelect(cur);
       });
     }
+    
+    // Bei Sprachwechsel: Platzhalter und Logo-Auswahl neu beschriften, Eingaben bleiben erhalten
+    window.onLangChange = () => {
+      updatePasswordPlaceholder();
+      buildLogoSelects();
+      document.querySelectorAll('.service-name').forEach(el => el.placeholder = t('settings.name'));
+    };
     
     loadConfig();
   </script>
