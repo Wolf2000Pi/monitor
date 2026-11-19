@@ -219,7 +219,7 @@ const server = http.createServer(async (req, res) => {
   const url = req.url.split('?')[0];
   const isAuthenticated = needsAuth ? validateSession(req) : true;
   
-  if (needsAuth && !isAuthenticated && url !== '/login' && url !== '/login.html' && url !== '/api/login') {
+  if (needsAuth && !isAuthenticated && url !== '/login' && url !== '/login.html' && url !== '/api/login' && url !== '/i18n.js') {
     if (url.startsWith('/api/') && url !== '/api/login') {
       res.writeHead(401);
       res.end(JSON.stringify({ error: 'Unauthorized' }));
