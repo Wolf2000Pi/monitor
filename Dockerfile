@@ -2,7 +2,8 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache tini
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache tini
 
 COPY package.json server.js update.js ./
 COPY public ./public
